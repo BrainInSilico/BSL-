@@ -33,11 +33,14 @@ if(!isTRUE("BreedingSchemeLanguage" %in% .packages(all.available=TRUE))) {
   installBSL()
 }
 library(BreedingSchemeLanguage)
-
+#** set some parameters **
+percentQTL <- 0.2
+nMarkers <- 1002
+nQTL <- ceiling(percentQTL*nMarker)
 #** run simulation **
 
 # simulate phenotipic selection
-defineSpecies(nSim = 5)
+defineSpecies(nSim = 5, nMarkers = nMarkers, nQTL = nQTL)
 initializePopulation()
 phenotype()
 select()
