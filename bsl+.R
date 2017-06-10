@@ -34,16 +34,18 @@ if(!isTRUE("BreedingSchemeLanguage" %in% .packages(all.available=TRUE))) {
 }
 library(BreedingSchemeLanguage)
 #** set some parameters **
+initPop <- 100
 percentQTL <- 0.2
 nMarkers <- 1002
 nQTL <- ceiling(percentQTL*nMarker)
+nselectedParents <- 50
 #** run simulation **
 
 # simulate phenotipic selection
-defineSpecies(nSim = 5, nMarkers = nMarkers, nQTL = nQTL)
-initializePopulation()
+defineSpecies(nSim = 1, nMarkers = nMarkers, nQTL = nQTL)
+initializePopulation(nPop = initPop)
 phenotype()
-select()
+select(nSelect = nselectedParents)
 cross()
 phenotype()
 select()
