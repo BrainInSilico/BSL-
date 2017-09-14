@@ -35,8 +35,12 @@ calcGenotypicValue <- function(geno, mapData){
 #'@param errorVar error variance
 #'
 # If gv is a multitrait matrix, errorVar is equal across all traits
-calcPhenotypicValue <- function(gv, nRep, errorVar){
-  totalVar <- rnorm(length(gv)*nRep, 0, sqrt(errorVar))
-  pv <- c(gv) + totalVar
+calcPhenotypicValue <- function(gv, nRep, errorVar, heritabilityVar){
+  if(!is.na(heritabilityVar)) {
+    errorVar <- rnorm(length(gv)*nRep, 0, sqrt(heritabilityVar))
+  } else {
+    errorVar <- rnorm(length(gv)*nRep, 0, sqrt(errorVar))
+  }
+  pv <- c(gv) + errorVar
   return(pv)
 }

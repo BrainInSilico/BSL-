@@ -41,7 +41,6 @@ cross <- function(sEnv=simEnv, nProgeny=100, equalContribution=F, popID=NULL, po
       pedigree <- cbind(GID.1[parents[,1]], GID.2[parents[,2]-nPar1], 0)
     }
     bsl <- addProgenyData(bsl, geno, pedigree)
-    if (exists("totalCost", bsl)) bsl$totalCost <- bsl$totalCost + nProgeny * bsl$costs$crossCost
     return(bsl)
   }#END cross.func
 

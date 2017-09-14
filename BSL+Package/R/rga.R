@@ -16,10 +16,6 @@ rga <- function(sEnv = simEnv, nGeneration=4) {
       geno <- geno$progenies
       data <- addProgenyData(data, geno, pedigree)
     }
-    # update cost but differently than a classical selfFertilize() :
-    # number of lines x number of generation x cost
-    if (exists("totalCost", data)) 
-      data$totalCost <- data$totalCost + nPar * data$costs$rgaCost * nGeneration
     return(data)
   }
   with(sEnv, {

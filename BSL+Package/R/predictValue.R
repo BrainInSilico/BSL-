@@ -97,7 +97,6 @@ predictValue <- function(sEnv=simEnv, popID=NULL, trainingPopID=NULL, locations=
     bsl$predRec <- rbind(bsl$predRec, toAdd)
 
     bsl$selCriterion <- list(popID=popID, criterion="pred")
-    if (exists("totalCost", bsl)) bsl$totalCost <- bsl$totalCost + bsl$costs$predCost
     return(bsl)
   }#END predict.func
   with(sEnv, {

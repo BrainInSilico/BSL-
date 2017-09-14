@@ -37,6 +37,8 @@ initializePopulation <- function(sEnv=simEnv, nInd=100){
     data$geno <- geno; data$genoRec <- genoRec; data$gValue <- gValue
     data$locEffects <- locEffects; data$locEffectsI <- locEffectsI
     data$yearEffects <- yearEffects; data$yearEffectsI <- yearEffectsI
+    # create reference markers for MAS
+    
     return(data)
   }
   with(sEnv, {

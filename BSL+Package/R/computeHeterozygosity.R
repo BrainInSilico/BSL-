@@ -28,7 +28,7 @@ computeHeterozygosity.fun <- function(bsl, popID) {
   bsl$genoRec <- data.frame(bsl$genoRec, heterozygosityRate=rep(NA, nrow(bsl$genoRec)))
   # apply computeHeterozygosity.core to all genomes
   bsl$genoRec$heterozygosityRate[id] <- unlist(apply(indexes, 2, computeHeterozygosity.core, genomes))
-  bsl$selCriterion <- list(popID=popID, criterion="hetz")
+  #bsl$selCriterion <- list(popID=popID, criterion="hetz")
   return(bsl)
 }
 

@@ -13,7 +13,7 @@
 #'
 #'@export
 defineVariances <- function(sEnv=simEnv, gVariance=1, locCorrelations=NULL, gByLocVar=1, gByYearVar=1,
-                            fracGxEAdd=0.8, plotTypeErrVars=c(Standard=1), coefH2=0){
+                            fracGxEAdd=0.8, plotTypeErrVars=c(Standard=1), h2=1){
   parent.env(sEnv) <- environment()
   variances.func <- function(bsl, gVariance, locCorrelations, gByLocVar, gByYearVar, fracGxEAdd, plotTypeErrVars){
     randLoc <- is.null(locCorrelations)
@@ -26,12 +26,8 @@ defineVariances <- function(sEnv=simEnv, gVariance=1, locCorrelations=NULL, gByL
     if (newEff > 0){
       bsl$mapData$effects <- cbind(bsl$mapData$effects, sapply(1:newEff, function(d) sample(bsl$mapData$effects[,1])))
     }
-    # compute coefH2 from a pre-built linear model
-    h2Model <- readRDS("BSL+Package/lib/coefH2Model.rds")
-    h2 <- data.frame(H2=coefH2)
-    coefH2 <- predict.lm(object = h2Model, newdata = h2)
     bsl$varParms <- list(gVariance=gVariance, gByLocVar=gByLocVar, gByYearVar=gByYearVar, fracGxEAdd=fracGxEAdd,
-                         randLoc=randLoc, locCov=locCov, plotTypeErrVars=plotTypeErrVars, coefH2=coefH2)
+                         randLoc=randLoc, locCov=locCov, plotTypeErrVars=plotTypeErrVars, h2=h2)
     return(bsl)
   }
   

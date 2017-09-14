@@ -17,7 +17,9 @@
 #'@return An environment that contains objects for the number of simulations specified
 #'
 #'@export
-defineSpecies <- function(loadData=NULL, importFounderHap=NULL, saveDataFileName="previousData", nSim=1, nCore=1, nChr=7, lengthChr=150, effPopSize=100, nMarkers=1000, nQTL=50, propDomi=0, nEpiLoci=0, domModel="HetHom"){
+defineSpecies <- function(loadData=NULL, importFounderHap=NULL, saveDataFileName="previousData", nSim=1, nCore=1,
+                          nChr=7, lengthChr=150, effPopSize=100, nMarkers=1000, nQTL=50, propDomi=0, nEpiLoci=0,
+                          domModel="HetHom", MAS=NULL){
   defineSpecies.func <- function(simNum, nChr, lengthChr, effPopSize, nMarkers, nQTL, propDomi, nEpiLoci, founderHaps=NULL, domModel){
     seed <- round(runif(1, 0, 1e9))
     nLoci <- nMarkers + nQTL * (nEpiLoci + 1) * 2
@@ -40,7 +42,7 @@ defineSpecies <- function(loadData=NULL, importFounderHap=NULL, saveDataFileName
     mapData$domModel <- domModel
     return(list(mapData=mapData, founderHaps=markers))
   }#END defineSpecies.func
-  
+  currentStep <- 1
   if(is.null(loadData)){
     if (is.null(importFounderHap)){
     sims <- lapply(1:nSim, defineSpecies.func, nChr=nChr, lengthChr=lengthChr, effPopSize=effPopSize, nMarkers=nMarkers, nQTL=nQTL, propDomi=propDomi, nEpiLoci=nEpiLoci, domModel=domModel)
@@ -49,7 +51,7 @@ defineSpecies <- function(loadData=NULL, importFounderHap=NULL, saveDataFileName
       foundHap <- phasedHapMap2mat(foundHap)
       sims <- lapply(1:nSim, defineSpecies.func, nChr=nChr, lengthChr=lengthChr, effPopSize=effPopSize, nMarkers=nMarkers, nQTL=nQTL, propDomi=propDomi, nEpiLoci=nEpiLoci, founderHaps=foundHap, domModel=domModel)
     }
-    save(sims, nSim, nCore, file=paste(saveDataFileName, ".RData", sep=""))
+    save(sims, nSim, nCore, MAS, currentStep, file=paste(saveDataFileName, ".RData", sep=""))
   }else{ # loadData not NULL
     load(paste(loadData, ".RData", sep=""))
     # Backward compatibility for versions that did not have domModel
@@ -57,9 +59,10 @@ defineSpecies <- function(loadData=NULL, importFounderHap=NULL, saveDataFileName
       bsl$mapData$domModel <- "HetHom"
       return(bsl)
     })
+    currentStep <- 1
   }
   # list of objects to remove before returning the environment
-  toRemove <- c(setdiff(ls(), c("sims", "nSim", "nCore")), "toRemove")
+  toRemove <- c(setdiff(ls(), c("sims", "nSim", "nCore", "MAS", "currentStep")), "toRemove")
   rm(list=toRemove)
   defineVariances(environment())
   return(environment())

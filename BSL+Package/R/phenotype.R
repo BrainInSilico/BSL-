@@ -13,7 +13,7 @@
 phenotype <- function(sEnv=simEnv, plotType="Standard", nRep=1, popID=NULL, locations=1, years=NULL){
   parent.env(sEnv) <- environment()
   phenotype.func <- function(bsl, plotType, nRep, popID, locations, years){
-    errorVar <- bsl$varParms$coefH2 + (bsl$varParms$plotTypeErrVars[plotType] / nRep)
+    errorVar <- bsl$varParms$plotTypeErrVars[plotType] / nRep
     names(errorVar) <- NULL
     # When to phenotype
     if (is.null(years)) years=max(ncol(bsl$yearEffects), 1)
@@ -22,18 +22,21 @@ phenotype <- function(sEnv=simEnv, plotType="Standard", nRep=1, popID=NULL, loca
       popID <- max(bsl$genoRec$popID)
     }
     tf <- bsl$genoRec$popID %in% popID
+    pVar <- (var(bsl$gValue[tf]) * (1-bsl$varParms$h2))/bsl$varParms$h2
     nPhen <- sum(tf)
     nLoc <- length(locations)
     nYr <- length(years)
     nTrial <- nYr
     if (bsl$varParms$randLoc){
       nTrial <- nTrial * nLoc
-      pValue <- calcPhenotypicValue(gv=bsl$gValue[tf,,drop=F], nRep=nTrial, errorVar=errorVar)
+      pValue <- calcPhenotypicValue(gv=bsl$gValue[tf,,drop=F], nRep=nTrial, errorVar=errorVar,
+                                    heritabilityVar = pVar)
     } else{
       if (!all(locations %in% 1:ncol(bsl$gValue))){
         stop("Phenotyping at unknown locations")
       }
-      pValue <- calcPhenotypicValue(gv=bsl$gValue[tf, locations, drop=F], nRep=nTrial, errorVar=errorVar)
+      pValue <- calcPhenotypicValue(gv=bsl$gValue[tf, locations, drop=F], nRep=nTrial, errorVar=errorVar,
+                                    heritabilityVar = pVar)
     }
     # Year and location effects to add in
     nInd <- max(bsl$genoRec$GID)
@@ -94,7 +97,10 @@ phenotype <- function(sEnv=simEnv, plotType="Standard", nRep=1, popID=NULL, loca
     # Take care of costs
     if (exists("totalCost", bsl)){
       perPlotCost <- bsl$costs$phenoCost[plotType]
-      bsl$totalCost <- bsl$totalCost + nPhen * perPlotCost * nLoc * nYr * nRep
+      currentCost <- nPhen * perPlotCost * nLoc * nYr * nRep
+      bsl$totalCost <- bsl$totalCost + currentCost
+      bsl$costs$stepCosts[bsl$costs$currentStep] <- currentCost
+      bsl$costs$currentStep <- bsl$costs$currentStep+1
     }
     
     return(bsl)
