@@ -16,6 +16,7 @@ if(!isTRUE("BreedingSchemeLanguage" %in% .packages(all.available=TRUE))) {
   installBSL()
 }
 library(BreedingSchemeLanguage)
+print(paste("**** this is BSL+, version ***", packageVersion("BreedingSchemeLanguage")))
 library(miscTools)
 #** set some parameters **
 args <- "bslParameters.txt"
