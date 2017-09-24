@@ -28,7 +28,8 @@ defineSpecies <- function(loadData=NULL, importFounderHap=NULL, saveDataFileName
       piecesPerM <- 10000
       nPiecesPerChr <- lengthChr / 100 * piecesPerM
       recBTpieces <- 1 / piecesPerM
-      coalSim <- getCoalescentSim(effPopSize=2 * effPopSize, nMrkOrMut=nLoci, nChr=nChr, nPiecesPerChr=nPiecesPerChr, recBTpieces=recBTpieces, minMAF=minMAF, seed=seed)
+      coalSim <- getCoalescentSim(effPopSize=2 * effPopSize, nMrkOrMut=nLoci, nChr=nChr, nPiecesPerChr=nPiecesPerChr,
+                                  recBTpieces=recBTpieces, minMAF=minMAF, seed=seed)
       markers <- coalSim$markers
       map <- coalSim$map
       mapData <- makeMap(map=map, nLoci=nLoci, nMarkers=nMarkers, nQTL=nQTL, propDomi=propDomi, interactionMean=nEpiLoci)

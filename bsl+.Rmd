@@ -1,0 +1,345 @@
+
+---
+title: "Breeding scheme simulation"
+params:
+    
+  nCycle:
+    input: numeric
+    label: Number of cycles
+    value: 1
+    
+  doEstimateCost:
+    input: checkbox
+    label: Estimate cost
+    value: yes
+    
+  doEstimateGG:
+    input: checkbox
+    label: estimate genetic gain
+    value: yes
+    
+  nSim:
+    input: numeric
+    label: Number of simulations
+    value: 1
+ 
+  initialPopulation:
+    input: numeric
+    label: Size of the initial population
+    value: 100
+    
+  nMarkers:
+    input: numeric
+    label: Number of markers
+    value: 1000
+  
+  selectionCross:
+    input: checkbox
+    label: selection after crossing
+    value: yes
+    
+  choiceSCross:
+    input: select
+    label: which selection method to use
+    choices: [phenotypic, genotypic]
+    value: phenotypic
+    
+  nbSCross:
+    input: numeric
+    label: number line to select
+    value: 100
+
+  rga:
+    input: checkbox
+    label: RGA
+    value: yes
+    
+  nRGA:
+    input : numeric
+    label: number of RGA generations
+    value: 4
+    
+  selectionRGA:
+    input: checkbox
+    label: selection after RGA
+    value: yes  
+    
+  choiceSRGA:
+    input: select
+    label: which selection method to use
+    choices: [phenotypic, genotypic]
+    value: phenotypic
+    
+  nbSRGA:
+    input: numeric
+    label: number line to select
+    value: 100
+    
+  LST:
+    input: checkbox
+    label: LST
+    value: yes
+    
+  nbLST:
+    input: numeric
+    label: number of lines after LST
+    value: 1000
+    
+  selectionLST:
+    input: checkbox
+    label: selection after LST
+    value: yes  
+    
+  choiceSLST:
+    input: select
+    label: which selection method to use
+    choices: [phenotypic, genotypic]
+    value: phenotypic
+    
+  nbSLST:
+    input: numeric
+    label: number line to select
+    value: 100
+    
+  OYT:
+    input: checkbox
+    label: OYT
+    value: yes      
+    
+  selectionOYT:
+    input: checkbox
+    label: selection after OYT
+    value: yes 
+    
+  choiceSOYT:
+    input: select
+    label: which selection method to use
+    choices: [phenotypic, genotypic]
+    value: phenotypic
+    
+  nbSOYT:
+    input: numeric
+    label: number line to select
+    value: 100
+    
+  PYT:
+    input: checkbox
+    label: PYT
+    value: yes      
+   
+  selectionPYT:
+    input: checkbox
+    label: selection after OYT
+    value: yes  
+  
+  choiceSPYT:
+    input: select
+    label: which selection method to use
+    choices: [phenotypic, genotypic]
+    value: phenotypic
+    
+  nbSPYT:
+    input: numeric
+    label: number line to select
+    value: 100  
+  
+  AYT:
+    input: checkbox
+    label: AYT
+    value: yes      
+   
+  selectionAYT:
+    input: checkbox
+    label: selection after AYT
+    value: yes
+  
+  choiceSAYT:
+    input: select
+    label: which selection method to use
+    choices: [phenotypic, genotypic]
+    value: phenotypic
+    
+  nbSAYT:
+    input: numeric
+    label: number line to select
+    value: 100
+    
+output:
+  pdf_document: default
+---
+
+<!-- ######################## bsl+ ######################
+     #
+     # creation date : 03/07/2017 
+     # last update : 24/09/2017 
+     #
+     # description : run a simulation of population using BSL (Shiori Yabe, Hiroyoshi Iwata, and Jean-Luc Jannink)
+     # with extra features
+     # 
+     ##################################################### -->
+
+
+Version `r packageVersion("BSLplus")`
+ author : Nicolas Beaume (nicolas.beaume@braininsilico.com)  
+ Based on package BreedingSchemLanguage (Shiori Yabe, Hiroyoshi Iwata and Jean-Luc Jannink)
+ 
+
+```{r selectFunction, include=FALSE}
+
+selection <- function(selectionMethod, nSelected) {
+  switch(selectionMethod,
+  genotypic={
+    for(i in 1:simEnv$nSim) {
+      cost <- args$genoCost*computePopulationSize(simEnv$sims[[i]])+params$nbSCross*args$selectCost ;
+    }
+    updateCost(cost=cost);
+    genotype();
+    select(nSelect=params$nSelected)},
+  phenotypic={
+    for(i in 1:simEnv$nSim) {
+      cost <- args$phenoCost*computePopulationSize(simEnv$sims[[i]])+params$nbSCross*args$selectCost;
+    }
+    updateCost(cost=cost);
+    phenotype();
+    select(nSelect=params$nSelected)}
+  )
+}
+
+```
+
+
+```{r setup, include=F}
+knitr::opts_chunk$set(echo = TRUE)
+#******************** main **************************
+# test if the package is installed, in case not, install it
+if(!isTRUE("BSLplus" %in% .packages(all.available=TRUE))) {
+  installBSL()
+}
+
+library(BSLplus)
+library(miscTools)
+# ** set some parameters **
+args <- readParameters("bslParameters.txt")
+```
+
+```{r initialize simulation, include=F}
+ # initiate simulation
+ simEnv <- defineSpecies(nSim = params$nSim, nMarkers = params$nMarkers, nQTL = args$nQTL, MAS=args$mas)
+ # set optional QTL effects
+ if(any("qtlEffects"%in%names(args))) {
+   setQTLeffect(effects = args$qtlEffects)
+ }
+ defineVariances()
+ defineCosts(phenoCost = args$phenoCost, crossCost = args$crossCost, genoCost = args$genoCost,
+ rgaCost = args$rgaCost, lstCost=args$lstCost, oytCost=args$oytCost, pytCost=args$pytCost,
+ aytCost=args$aytCost, masCost=args$masCost)
+ initializePopulation(nInd = params$initialPopulation)
+ # marker fixation
+ if(any("fixedMarkerIDs"%in%names(args))) {
+   fixMarkers(markerIDs=args$fixedMarkerIDs, values=args$fixedMarkerValues)
+ }
+```
+
+```{r cross, include=FALSE}
+# cross
+for(i in 1:simEnv$nSim) {
+  cost <- args$crossCost
+  }
+updateCost(cost=cost);
+cross()
+# optional selection
+if(params$selectionCross) {
+  switch(params$choiceSCross,
+        
+}
+```
+```{r RGA, include=FALSE}
+if(params$rga) {
+  for(i in 1:simEnv$nSim) {
+    cost <- args$rgaCost * computePopulationSize(simEnv$sims[[i]]);
+  }
+  updateCost(cost=cost);
+  rga(nGeneration = params$nRGA)
+  if(params$selectionRGA) {
+    switch(params$choiceSRGA,
+          genotypic={
+           for(i in 1:simEnv$nSim) {
+             cost <- args$genoCost*computePopulationSize(simEnv$sims[[i]])+params$nbSRGA*args$selectCost ;
+           }
+           updateCost(cost=cost);
+           genotype();
+           select(nSelect=params$nbSRGA)},
+          phenotypic={
+           for(i in 1:simEnv$nSim) {
+             cost <- args$phenoCost*computePopulationSize(simEnv$sims[[i]])+params$nbSRGA*args$selectCost;
+           }
+           updateCost(cost=cost);
+           phenotype();
+           select(nSelect=params$nbSRGA)}
+         )
+  }
+}
+```
+
+```{r LST, include=FALSE}
+if(params$LST) {
+  for(i in 1:simEnv$nSim) {
+    cost <- args$lstCost * computePopulationSize(simEnv$sims[[i]])
+  }
+  updateCost(cost=cost)
+  selfFertilize(nProgeny = params$nbLST)
+  # not used for now as it include a selection we may want to parametrize through the scheme
+  # inBredObs(params$nbLST)
+  if(params$selectionLST) {
+    switch(params$choiceSLST,
+          genotypic={
+           for(i in 1:simEnv$nSim) {
+             cost <- args$genoCost*computePopulationSize(simEnv$sims[[i]])+params$nbSLST*args$selectCost ;
+           }
+           updateCost(cost=cost);
+           genotype();
+           select(nSelect=params$nbSLST)},
+          phenotypic={
+           for(i in 1:simEnv$nSim) {
+             cost <- args$phenoCost*computePopulationSize(simEnv$sims[[i]])+params$nbSLST*args$selectCost;
+           }
+           updateCost(cost=cost);
+           phenotype();
+           select(nSelect=params$nbSLST)}
+         )
+  }
+}
+```
+
+```{r output, include=FALSE}
+# pdf("testBSL.pdf")
+# plotData()
+# dev.off()
+# selectionRate()
+# geneticGain()
+# # write total cost, selection rate, genetic gate, heterozygosity and EBV
+# for(i in 1:simEnv$nSim) {
+#   computeHeterozygosity(popID = unique(simEnv$sims[[i]]$genoRec$popID))
+#   heterozygosity <- data.frame(lineID=simEnv$sims[[i]]$genoRec$GID)
+#   if(exists("predRec", simEnv$sims[[i]])) {
+#     ebv <- data.frame(lineID=simEnv$sims[[i]]$predRec$predGID,
+#                       generationID=simEnv$sims[[i]]$predRec$predNo)
+#   }
+#   if(exists("predRec", simEnv$sims[[i]])) {
+#     ebv <- data.frame(ebv, simEnv$sims[[i]]$predRec$predict)
+#   }
+#   heterozygosity <- data.frame(heterozygosity, simEnv$sims[[i]]$genoRec$heterozygosityRate)
+#   write.csv(selRate[[i]], file = paste("selectionRate_sim",i,".csv", sep=""), row.names = T)
+#   write.csv(genGain[[i]], file = paste("geneticGain_sim",i,".csv", sep=""), row.names = T)
+#   if(exists("ebv")) {
+#     colnames(ebv) <- c("lineID", "generationID", "EBV")
+#     write.csv(ebv, file = paste("breedingValues_sim",i,".csv"), row.names = F)
+#   }
+#   colnames(heterozygosity) <- c("lineID", "heterozygosity")
+#   write.csv(heterozygosity, file = paste("heterozygosity_sim",i,".csv"), row.names = F)
+# }
+```
+
+
+
+

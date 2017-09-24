@@ -19,7 +19,6 @@ initializePopulation <- function(sEnv=simEnv, nInd=100){
     pedigree <- cbind(-geno$pedigree, 0) # For founders, parents will be negative
     colnames(pedigree) <- 1:3
     geno <- geno$progenies
-    
     # Genetic effects. This works even if locCov is scalar
     gValue <- calcGenotypicValue(geno=geno, mapData=md)
     coef <- solve(chol(var(gValue))) %*% chol(data$varParms$locCov)

@@ -1,19 +1,12 @@
-number of simulation : 1
-initial population : 10000
-number of markers : 1000
-ratio of QTL : 0.2
+number of QTL : 10
 set QTL effects ("y" or "n", case not sensitive, anything else is assumed to be "n") : y
 QTLs effects (no effect if the above option is set as anything else than "y") : 2.1;1.7;-1.8;-0.3
-number of individual to select at each selection : 10000
-progeny size (each time a progeny is generated) : 1000
 cross cost : 38
-phenotyping cost : 40
-genotyping cost : 35
+phenotyping cost : 5
+genotyping cost : 2
 selection cost : 1
-number of RGA generation : 4
 RGA cost (per generation) : 1
 LST cost (total) : 3
-final population after LST : 1000
 OYT cost : 6
 PYT cost : 13
 AYT cost : 25

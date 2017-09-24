@@ -1,7 +1,7 @@
 Package: BSLplus
 Type: Package
 Title: Describe and simulate breeding schemes
-Version: 1.4.1
+Version: 1.7
 Date: 2016-03-08
 Author: Shiori Yabe, Hiroyoshi Iwata, Nicolas Beaume and Jean-Luc Jannink
 Maintainer: Shiori Yabe <syabe@affrc.go.jp>
